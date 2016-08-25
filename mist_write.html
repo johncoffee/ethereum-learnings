@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div>
+    <input model="theName"> <button class="submit-button">Set</button>
+</div>
+
+<div class="waiting" hidden>Waiting for confirmations...</div>
+
+<script src="node_modules/web3/dist/web3.js"></script>
+<script>
+//contract MyWriteContract {
+//    string public theName;
+//
+//    function MyWriteContract() {
+//
+//    }
+//
+//    function setTheName(string newName) {
+//        theName = newName;
+//    }
+//}
+
+function Write() {
+
+    contractInstance = null
+
+    function constructor() {
+        var web3
+        var Web3
+
+        Web3 = require('web3');
+
+// set the provider you want from Web3.providers
+
+        web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+
+        var theAddressWhereMyContractLives = `0x5bDeD392181df4BA96B9b092B9382C364d235BaC`;
+        var abiContractContent = `[ { "constant": false, "inputs": [ { "name": "newName", "type": "string" } ], "name": "setTheName", "outputs": [], "type": "function" }, { "constant": true, "inputs": [], "name": "theName", "outputs": [ { "name": "", "type": "string", "value": "" } ], "type": "function" }, { "inputs": [], "type": "constructor" } ]`
+        var abiJsonContract = JSON.parse(abiContractContent);
+        var contract = web3.eth.contract(abiJsonContract);
+        contractInstance = contract.at(theAddressWhereMyContractLives);
+
+        web3.eth.defaultAccount = web3.eth.coinbase;
+        console.log("connected: " + web3.isConnected());
+
+
+        document.querySelector('.submit-button').addEventListener("click", function() {
+            document.querySelector('.waiting').hidden = false
+            document.querySelector('.submit-button').disabled = true
+            document.querySelector('[model="theName"]').disabled = true
+
+            console.log(`theName was ` + contractInstance.theName().toString() ); // returns a string
+            var result = contractInstance.setTheName(getTheName() )
+            console.log(`setting the name... wait for it in the next block.`);
+        });
+    }
+
+    function getTheName() {
+        return document.querySelector('[model="theName"]').value;
+    }
+
+    constructor();
+}
+
+new Write();
+</script>
+
+</body>
+</html>
