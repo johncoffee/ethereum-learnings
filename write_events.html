@@ -61,17 +61,33 @@ function Write() {
 // watch for changes
         event.watch(function(error, result){
             console.log("number event");
-            console.log(!error ? result : error);
+            console.dir(!error ? result : error);
+            setEnabled(!error)
         });
 
+        setEnabled(true)
 
         document.querySelector('.submit-button').addEventListener("click", function() {
-            document.querySelector('.waiting').hidden = false
-            document.querySelector('.submit-button').disabled = true
-            document.querySelector('[model="theName"]').disabled = true
+            setEnabled(false)
 
-            var result = contractInstance.changeNumber( parseInt(document.querySelector('[model="theName"]').value, 10) )
+            var isLocked = false;
+            try {
+                var result = contractInstance.changeNumber(parseInt(document.querySelector('[model="theName"]').value, 10))
+            }
+            catch (e) {
+                isLocked = e.toString().match(/locked/i) !== null;
+            }
+
+            if (isLocked) {
+                alert("unlock you coinbase account");
+            }
         });
+
+        function setEnabled(enabled) {
+            document.querySelector('.waiting').hidden = enabled
+            document.querySelector('.submit-button').disabled = !enabled
+            document.querySelector('[model="theName"]').disabled = !enabled
+        }
     }
 
 
