@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div>
+    <input model="theName"> <button class="submit-button">Set</button>
+</div>
+
+<div class="waiting" hidden>Waiting for confirmations...</div>
+
+<script src="node_modules/web3/dist/web3.js"></script>
+<script>
+var contractCode = `
+contract MyContractEvents {
+
+    event NumberChanged(address indexed _from, uint256 indexed _newNumber);
+
+    uint256 public theNumber;
+
+    function MyContractEvents() {
+        theNumber = 0;
+    }
+
+    function changeNumber (uint256 newNumber) {
+        if (newNumber >= 0) {
+            theNumber = newNumber;
+            NumberChanged(msg.sender, newNumber);
+        }
+    }
+}
+`
+
+function Write() {
+
+    contractInstance = null
+
+    function constructor() {
+        var web3
+        var Web3
+
+        Web3 = require('web3');
+
+// set the provider you want from Web3.providers
+
+        web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+
+        var theAddressWhereMyContractLives = `0x75Ef331B485276DEB391596F82342BEeEc6052FD`; // testnet
+        var abiContractContent = `[ { "constant": false, "inputs": [ { "name": "newNumber", "type": "uint256" } ], "name": "changeNumber", "outputs": [], "type": "function" }, { "constant": true, "inputs": [], "name": "theNumber", "outputs": [ { "name": "", "type": "uint256", "value": "0" } ], "type": "function" }, { "inputs": [], "type": "constructor" }, { "anonymous": false, "inputs": [ { "indexed": true, "name": "_from", "type": "address" }, { "indexed": true, "name": "_newNumber", "type": "uint256" } ], "name": "NumberChanged", "type": "event" } ]`
+        var abiJsonContract = JSON.parse(abiContractContent);
+        var contract = web3.eth.contract(abiJsonContract);
+        contractInstance = contract.at(theAddressWhereMyContractLives);
+
+        web3.eth.defaultAccount = web3.eth.coinbase;
+        console.log("connected: " + web3.isConnected());
+
+        var event = contractInstance.NumberChanged();
+// watch for changes
+        event.watch(function(error, result){
+            console.log("number event");
+            console.log(!error ? result : error);
+        });
+
+
+        document.querySelector('.submit-button').addEventListener("click", function() {
+            document.querySelector('.waiting').hidden = false
+            document.querySelector('.submit-button').disabled = true
+            document.querySelector('[model="theName"]').disabled = true
+
+            var result = contractInstance.changeNumber( parseInt(document.querySelector('[model="theName"]').value, 10) )
+        });
+    }
+
+
+
+    constructor();
+}
+
+new Write();
+</script>
+
+</body>
+</html>
