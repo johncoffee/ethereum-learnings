@@ -14,11 +14,10 @@ contract Owned {
     }
 
     function kill() onlyOwner {
-        suicide(owner);
+        selfdestruct(owner);
     }
 }
 
-// This is the base contract that your contract derr extends from.
 contract BaseRegistry is Owned {
     uint8 public constant UNREGISTER_COST = 255;
 
@@ -29,35 +28,37 @@ contract BaseRegistry is Owned {
         uint time;
         // Keeps the index of the keys array for fast lookup
         uint keysIndex;
-        bytes20 btih;
+        int[] lat;
+        int[] lng;
         address[] owners;
     }
 
     // This mapping keeps the records of this Registry.
-    mapping(address => Record) records;
+    mapping(bytes => Record) records;
 
     // Keeps the total numbers of records in this Registry.
     uint public numRecords;
 
     // Keeps a list of all keys to interate the records.
-    address[] public keys;
+    bytes[] public keys;
 
 
-    modifier onlyRecordOwner(address key, address sender) {
+    modifier onlyRecordOwner(bytes key, address sender) {
         address owner = getOwner(key);
         if (owner != sender) throw;
         _
     }
 
     // This is the function that actually insert a record.
-    function register(address key, bytes20 btih) {
+    function register(bytes key, int lat, int lng) {
         if (records[key].time == 0) {
             records[key].time = now;
             records[key].keysIndex = keys.length;
             records[key].owners.push(msg.sender);
             keys.length++;
             keys[keys.length - 1] = key;
-            records[key].btih = btih;
+            records[key].lat.push(lat);
+            records[key].lng.push(lng);
             numRecords++;
         } else {
             throw;
@@ -65,14 +66,14 @@ contract BaseRegistry is Owned {
     }
 
     // Updates the values of the given record.
-    function update(address key, bytes20 btih) onlyRecordOwner(key, msg.sender) {
-        records[key].btih = btih;
-    }
+    // function update(address key, bytes20 btih) onlyRecordOwner(key, msg.sender) {
+    //     records[key].btih = btih;
+    // }
 
     // Unregister a given record
-    function unregister(address key) onlyRecordOwner(key, msg.sender) {
-        if (msg.value == UNREGISTER_COST) {
-            distributeValueToOwners(key, msg.value);
+    function unregister(bytes key) onlyRecordOwner(key, msg.sender) {
+        // if (msg.value == UNREGISTER_COST) {
+            //distributeValueToOwners(key, msg.value);
 
             uint keysIndex = records[key].keysIndex;
             delete records[key];
@@ -80,10 +81,10 @@ contract BaseRegistry is Owned {
             keys[keysIndex] = keys[keys.length - 1];
             records[keys[keysIndex]].keysIndex = keysIndex;
             keys.length--;
-        }
+        // }
     }
 
-    function distributeValueToOwners(address key, uint value) {
+    function distributeValueToOwners(bytes key, uint value) {
         Record record = records[key];
         uint amountEach = value / (record.owners.length - 1);
         for (uint8 i = 0; i < record.owners.length - 1; i++) {
@@ -93,7 +94,7 @@ contract BaseRegistry is Owned {
     }
 
     // Transfer ownership of a given record.
-    function transfer(address key, address newOwner) {
+    function transfer(bytes key, address newOwner) {
         address owner = getOwner(key);
         if (owner == msg.sender) {
             records[key].owners.push(newOwner);
@@ -103,29 +104,29 @@ contract BaseRegistry is Owned {
     }
 
     // Tells whether a given key is registered.
-    function isRegistered(address key) returns(bool) {
+    function isRegistered(bytes key) returns(bool) {
         return records[key].time != 0;
     }
 
-    function getRecordAtIndex(uint rindex) returns(address key, address owner, uint time, bytes20 btih) {
-        Record record = records[keys[rindex]];
-        key = keys[rindex];
-        owner = getOwner(key);
-        time = record.time;
-        btih = record.btih;
-    }
+    // function getRecordAtIndex(uint rindex) returns(address key, address owner, uint time, bytes20 btih) {
+    //     Record record = records[keys[rindex]];
+    //     key = keys[rindex];
+    //     owner = getOwner(key);
+    //     time = record.time;
+    //     btih = record.btih;
+    // }
 
-    function getRecord(address key) returns(address owner, uint time, bytes32 btih) {
-        Record record = records[key];
-        owner = getOwner(key);
-        time = record.time;
-        btih = record.btih;
-    }
+    // function getRecord(address key) returns(address owner, uint time, bytes32 btih) {
+    //     Record record = records[key];
+    //     owner = getOwner(key);
+    //     time = record.time;
+    //     btih = record.btih;
+    // }
 
     // Returns the owner of the given record. The owner could also be get
     // by using the function getRecord but in that case all record attributes
     // are returned.
-    function getOwner(address key) returns(address) {
+    function getOwner(bytes key) returns(address) {
         Record record = records[key];
         return record.owners[record.owners.length-1];
     }
@@ -133,14 +134,14 @@ contract BaseRegistry is Owned {
     // Returns the registration time of the given record. The time could also
     // be get by using the function getRecord but in that case all record attributes
     // are returned.
-    function getTime(address key) returns(uint) {
+    function getTime(bytes key) returns(uint) {
         return records[key].time;
     }
 
-    // Registry owner can use this function to withdraw any value owned by
-    // the registry.
-    function withdraw(address to, uint value) onlyOwner {
-        to.send(value);
+    function empty() onlyOwner {
+        if (this.balance > 0) {
+            owner.send(this.balance);
+        }
     }
 }
 
