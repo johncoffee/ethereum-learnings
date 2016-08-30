@@ -28,9 +28,9 @@ contract BaseRegistry is Owned {
         uint time;
         // Keeps the index of the keys array for fast lookup
         uint keysIndex;
-        int[] lat;
-        int[] lng;
-        address[] owners;
+        int lat;
+        int lng;
+        address owner;
     }
 
     // This mapping keeps the records of this Registry.
@@ -54,50 +54,33 @@ contract BaseRegistry is Owned {
         if (records[key].time == 0) {
             records[key].time = now;
             records[key].keysIndex = keys.length;
-            records[key].owners.push(msg.sender);
+            records[key].owner = msg.sender;
             keys.length++;
             keys[keys.length - 1] = key;
-            records[key].lat.push(lat);
-            records[key].lng.push(lng);
+            records[key].lat = lat;
+            records[key].lng = lng;
             numRecords++;
         } else {
             throw;
         }
     }
 
-    // Updates the values of the given record.
-    // function update(address key, bytes20 btih) onlyRecordOwner(key, msg.sender) {
-    //     records[key].btih = btih;
-    // }
-
     // Unregister a given record
     function unregister(bytes key) onlyRecordOwner(key, msg.sender) {
-        // if (msg.value == UNREGISTER_COST) {
-            //distributeValueToOwners(key, msg.value);
-
             uint keysIndex = records[key].keysIndex;
             delete records[key];
             numRecords--;
             keys[keysIndex] = keys[keys.length - 1];
             records[keys[keysIndex]].keysIndex = keysIndex;
             keys.length--;
-        // }
     }
 
-    function distributeValueToOwners(bytes key, uint value) {
-        Record record = records[key];
-        uint amountEach = value / (record.owners.length - 1);
-        for (uint8 i = 0; i < record.owners.length - 1; i++) {
-            address owner = record.owners[i];
-            owner.send(amountEach);
-        }
-    }
 
     // Transfer ownership of a given record.
     function transfer(bytes key, address newOwner) {
         address owner = getOwner(key);
         if (owner == msg.sender) {
-            records[key].owners.push(newOwner);
+            records[key].owner = newOwner;
         } else {
             throw;
         }
@@ -123,12 +106,10 @@ contract BaseRegistry is Owned {
     //     btih = record.btih;
     // }
 
-    // Returns the owner of the given record. The owner could also be get
-    // by using the function getRecord but in that case all record attributes
-    // are returned.
+    // Returns the owner (address) of the given record.
     function getOwner(bytes key) returns(address) {
         Record record = records[key];
-        return record.owners[record.owners.length-1];
+        return record.owner;
     }
 
     // Returns the registration time of the given record. The time could also
