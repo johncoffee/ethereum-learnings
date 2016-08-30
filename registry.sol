@@ -19,8 +19,6 @@ contract Owned {
 }
 
 contract BaseRegistry is Owned {
-    uint8 public constant UNREGISTER_COST = 255;
-
     // This struct keeps all data for a Record.
     struct Record {
         // Keeps the address of this record creator.
@@ -31,6 +29,7 @@ contract BaseRegistry is Owned {
         int lat;
         int lng;
         address owner;
+        uint unregisterCost;
     }
 
     // This mapping keeps the records of this Registry.
