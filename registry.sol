@@ -57,7 +57,9 @@ contract BaseRegistry is Owned {
             records[key].lat = lat;
             records[key].lng = lng;
 
-            keys.push(key);
+            // not sure why we dont use .push?
+            keys.length++;
+            keys[keys.length - 1] = key;
 
             numRecords++;
         } else {
@@ -87,11 +89,11 @@ contract BaseRegistry is Owned {
     }
 
     // Tells whether a given key is registered.
-    function isRegistered(int key) returns(bool) {
+    function isRegistered(int key) public constant returns(bool) {
         return records[key].time != 0;
     }
 
-    function getRecordAtIndex(uint rindex) returns(address owner, uint time, int lat, int lng, uint unregisterCost) {
+    function getRecordAtIndex(uint rindex) public constant returns(address owner, uint time, int lat, int lng, uint unregisterCost) {
         int key = keys[rindex];
         Record record = records[key];
         owner = getOwner(key);
@@ -101,7 +103,7 @@ contract BaseRegistry is Owned {
         unregisterCost = record.unregisterCost;
     }
 
-    function getRecord(int key) returns(address owner, uint time, int lat, int lng, uint unregisterCost) {
+    function getRecord(int key) public constant returns(address owner, uint time, int lat, int lng, uint unregisterCost) {
         Record record = records[key];
         owner = getOwner(key);
         time = record.time;
@@ -111,7 +113,7 @@ contract BaseRegistry is Owned {
     }
 
     // Returns the owner (address) of the given record.
-    function getOwner(int key) returns(address) {
+    function getOwner(int key)  public constant returns(address) {
         Record record = records[key];
         return record.owner;
     }
@@ -119,7 +121,7 @@ contract BaseRegistry is Owned {
     // Returns the registration time of the given record. The time could also
     // be get by using the function getRecord but in that case all record attributes
     // are returned.
-    function getTime(int key) returns(uint) {
+    function getTime(int key)  public constant returns(uint) {
         return records[key].time;
     }
 
