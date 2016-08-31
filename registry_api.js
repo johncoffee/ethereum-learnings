@@ -32,14 +32,21 @@ function Api() {
     }
 
     this.getRecords = function () {
-
         var records = getKeys().map(function(item) {
-            return contractInstance.getRecord(item).map(function(item) {
+            var r = contractInstance.getRecord(item)
+            r.push(item)
+            return r.map(function(item) {
                 return item.toString()
             })
         })
 
-        return records;
+        return records
+    }
+
+    this.getRecord = function (key) {
+        return contractInstance.getRecord(key).map(function(item) {
+            return item.toString()
+        })
     }
 
     function getKeys() {
@@ -73,7 +80,7 @@ function Api() {
 
 
 //console.log(new Api().getRecords())
-new Api().register(5,5,5)
+//new Api().register(5,5,5)
 //new Api().transfer("42", "0x40096D35bfaa7a2ba5E5cAf6206A307187A6148F")
 
 module.exports = Api
