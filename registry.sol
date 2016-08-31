@@ -33,31 +33,32 @@ contract BaseRegistry is Owned {
     }
 
     // This mapping keeps the records of this Registry.
-    mapping(bytes => Record) records;
+    mapping(int => Record) records;
 
     // Keeps the total numbers of records in this Registry.
     uint public numRecords;
 
     // Keeps a list of all keys to interate the records.
-    bytes[] public keys;
+    int[] public keys;
 
 
-    modifier onlyRecordOwner(bytes key, address sender) {
+    modifier onlyRecordOwner(int key, address sender) {
         address owner = getOwner(key);
         if (owner != sender) throw;
         _
     }
 
     // This is the function that actually insert a record.
-    function register(bytes key, int lat, int lng) {
+    function register(int key, int lat, int lng) {
         if (records[key].time == 0) {
             records[key].time = now;
             records[key].keysIndex = keys.length;
             records[key].owner = msg.sender;
-            keys.length++;
-            keys[keys.length - 1] = key;
             records[key].lat = lat;
             records[key].lng = lng;
+
+            keys.push(key);
+
             numRecords++;
         } else {
             throw;
@@ -65,7 +66,7 @@ contract BaseRegistry is Owned {
     }
 
     // Unregister a given record
-    function unregister(bytes key) onlyRecordOwner(key, msg.sender) {
+    function unregister(int key) onlyRecordOwner(key, msg.sender) {
             uint keysIndex = records[key].keysIndex;
             delete records[key];
             numRecords--;
@@ -76,7 +77,7 @@ contract BaseRegistry is Owned {
 
 
     // Transfer ownership of a given record.
-    function transfer(bytes key, address newOwner) {
+    function transfer(int key, address newOwner) {
         address owner = getOwner(key);
         if (owner == msg.sender) {
             records[key].owner = newOwner;
@@ -86,27 +87,31 @@ contract BaseRegistry is Owned {
     }
 
     // Tells whether a given key is registered.
-    function isRegistered(bytes key) returns(bool) {
+    function isRegistered(int key) returns(bool) {
         return records[key].time != 0;
     }
 
-    // function getRecordAtIndex(uint rindex) returns(address key, address owner, uint time, bytes20 btih) {
-    //     Record record = records[keys[rindex]];
-    //     key = keys[rindex];
-    //     owner = getOwner(key);
-    //     time = record.time;
-    //     btih = record.btih;
-    // }
+    function getRecordAtIndex(uint rindex) returns(address owner, uint time, int lat, int lng, uint unregisterCost) {
+        int key = keys[rindex];
+        Record record = records[key];
+        owner = getOwner(key);
+        time = record.time;
+        lat = record.lat;
+        lng = record.lng;
+        unregisterCost = record.unregisterCost;
+    }
 
-    // function getRecord(address key) returns(address owner, uint time, bytes32 btih) {
-    //     Record record = records[key];
-    //     owner = getOwner(key);
-    //     time = record.time;
-    //     btih = record.btih;
-    // }
+    function getRecord(int key) returns(address owner, uint time, int lat, int lng, uint unregisterCost) {
+        Record record = records[key];
+        owner = getOwner(key);
+        time = record.time;
+        lat = record.lat;
+        lng = record.lng;
+        unregisterCost = record.unregisterCost;
+    }
 
     // Returns the owner (address) of the given record.
-    function getOwner(bytes key) returns(address) {
+    function getOwner(int key) returns(address) {
         Record record = records[key];
         return record.owner;
     }
@@ -114,7 +119,7 @@ contract BaseRegistry is Owned {
     // Returns the registration time of the given record. The time could also
     // be get by using the function getRecord but in that case all record attributes
     // are returned.
-    function getTime(bytes key) returns(uint) {
+    function getTime(int key) returns(uint) {
         return records[key].time;
     }
 
