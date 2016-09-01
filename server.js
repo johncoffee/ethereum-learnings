@@ -21,7 +21,7 @@ app.get('/records', function (req, res) {
     if (records) {
         if (req.query.format == "sjon") {
             res.set('Content-Type', 'text/plain');
-            res.send(records.join("|\n"));
+            res.send(records.join("\n"));
         }
         else {
             res.json(records); // not json because ... reasons
