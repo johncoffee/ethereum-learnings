@@ -9,7 +9,7 @@ function Record () {
 }
 
 Record.prototype.hydrate = function (values) {
-    for (var i in value) if (this.hasOwnProperty(i)) {
+    for (var i in values) if (this.hasOwnProperty(i)) {
         this[i] = values[i];
     }
 }
