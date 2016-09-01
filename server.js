@@ -14,19 +14,13 @@ app.get('/records', function (req, res) {
 
     records = records.map(function(item) {
         var recordEntity = new Record();
-
-        recordEntity.owner = item[0]
-        recordEntity.time = item[1]
-        recordEntity.lat = item[2]
-        recordEntity.lng = item[3]
-        recordEntity.unregisterCost = item[4]
-        recordEntity.key = item[5]
-
+        recordEntity.fromWeb3Array(item);
         return recordEntity;
     });
 
     if (records) {
         if (req.query.format == "sjon") {
+            res.set('Content-Type', 'text/plain');
             res.send(records.join("|\n"));
         }
         else {
@@ -64,6 +58,16 @@ function Record () {
     this.lat = 0;
     this.lng = 0;
 }
+
+Record.prototype.fromWeb3Array = function (array) {
+    this.owner = array[0]
+    this.time = array[1]
+    this.lat = array[2]
+    this.lng = array[3]
+    this.unregisterCost = array[4]
+    this.key = array[5]
+}
+
 Record.prototype.toString = function () {
     return JSON.stringify(this)
 }
