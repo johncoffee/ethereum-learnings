@@ -69,9 +69,8 @@ function Api() {
         return keys
     }
 
-    this.register =  function( key,  lat,  lng ) {
-        console.log("register", key,  lat,  lng);
-        contractInstance.register(key, lat, lng, {gas: 1000000});
+    this.register =  function( record, callback ) {
+        contractInstance.register(record.key, record.lat, record.lng, {gas: 1000000}, callback);
     }
 
     this.transfer = function( key, newOwner) {
