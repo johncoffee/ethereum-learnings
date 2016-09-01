@@ -15,14 +15,14 @@ function Api() {
     function constructor() {
 
 
-        var theAddressWhereMyContractLives = `0xAF71e4Af842A2a4f52e877A4cab98d96b91feaa8`
+        var theAddressWhereMyContractLives = `0xeb3c9df5acdce39bc57cd563d83c522e63a371ce`.trim()
 
         var abiContractContent = `
 
-[{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"keys","outputs":[{"name":"","type":"int256"}],"type":"function"},{"constant":false,"inputs":[],"name":"kill","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"key","type":"int256"},{"name":"newOwner","type":"address"}],"name":"transfer","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"key","type":"int256"}],"name":"registerSimple","outputs":[],"type":"function"},{"constant":true,"inputs":[{"name":"rindex","type":"uint256"}],"name":"getRecordAtIndex","outputs":[{"name":"owner","type":"address"},{"name":"time","type":"uint256"},{"name":"lat","type":"int256"},{"name":"lng","type":"int256"},{"name":"unregisterCost","type":"uint256"}],"type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"type":"function"},{"constant":true,"inputs":[{"name":"key","type":"int256"}],"name":"isRegistered","outputs":[{"name":"","type":"bool"}],"type":"function"},{"constant":true,"inputs":[],"name":"numRecords","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"constant":false,"inputs":[{"name":"key","type":"int256"},{"name":"lat","type":"int256"},{"name":"lng","type":"int256"}],"name":"register","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"key","type":"int256"}],"name":"unregister","outputs":[],"type":"function"},{"constant":true,"inputs":[{"name":"key","type":"int256"}],"name":"getTime","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"constant":true,"inputs":[{"name":"key","type":"int256"}],"name":"getOwner","outputs":[{"name":"","type":"address"}],"type":"function"},{"constant":true,"inputs":[{"name":"key","type":"int256"}],"name":"getRecord","outputs":[{"name":"owner","type":"address"},{"name":"time","type":"uint256"},{"name":"lat","type":"int256"},{"name":"lng","type":"int256"},{"name":"unregisterCost","type":"uint256"}],"type":"function"},{"constant":false,"inputs":[],"name":"empty","outputs":[],"type":"function"}]
+[{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"keys","outputs":[{"name":"","type":"int256"}],"type":"function"},{"constant":false,"inputs":[],"name":"kill","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"key","type":"int256"},{"name":"lat","type":"int256"},{"name":"lng","type":"int256"}],"name":"update","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"key","type":"int256"},{"name":"newOwner","type":"address"}],"name":"transfer","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"key","type":"int256"}],"name":"registerSimple","outputs":[],"type":"function"},{"constant":true,"inputs":[{"name":"rindex","type":"uint256"}],"name":"getRecordAtIndex","outputs":[{"name":"owner","type":"address"},{"name":"time","type":"uint256"},{"name":"lat","type":"int256"},{"name":"lng","type":"int256"},{"name":"unregisterCost","type":"uint256"}],"type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"type":"function"},{"constant":true,"inputs":[{"name":"key","type":"int256"}],"name":"isRegistered","outputs":[{"name":"","type":"bool"}],"type":"function"},{"constant":true,"inputs":[],"name":"numRecords","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"constant":false,"inputs":[{"name":"key","type":"int256"},{"name":"lat","type":"int256"},{"name":"lng","type":"int256"}],"name":"register","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"key","type":"int256"}],"name":"unregister","outputs":[],"type":"function"},{"constant":true,"inputs":[{"name":"key","type":"int256"}],"name":"getTime","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"constant":true,"inputs":[{"name":"key","type":"int256"}],"name":"getOwner","outputs":[{"name":"","type":"address"}],"type":"function"},{"constant":true,"inputs":[{"name":"key","type":"int256"}],"name":"getRecord","outputs":[{"name":"owner","type":"address"},{"name":"time","type":"uint256"},{"name":"lat","type":"int256"},{"name":"lng","type":"int256"},{"name":"unregisterCost","type":"uint256"}],"type":"function"},{"constant":false,"inputs":[],"name":"empty","outputs":[],"type":"function"}]
 
 
-`
+        `
 
         var abiJsonContract = JSON.parse(abiContractContent);
         var contract = web3.eth.contract(abiJsonContract);
@@ -47,6 +47,10 @@ function Api() {
         return contractInstance.getRecord(key).map(function(item) {
             return item.toString()
         })
+    }
+
+    this.update = function (record, callback) {
+        contractInstance.update(record.key, record.lat, record.lng, {gas: 190000}, callback);
     }
 
     function getKeys() {
@@ -80,7 +84,14 @@ function Api() {
 
 
 //console.log(new Api().getRecords())
-//new Api().register(5,5,5)
+
+//var Record = require('./record')
+//var r = new Record();
+//r.key = 42
+//r.lat = 666
+//r.lng = 4242
+//new Api().update(r)
+
 //new Api().transfer("42", "0x40096D35bfaa7a2ba5E5cAf6206A307187A6148F")
 
 module.exports = Api

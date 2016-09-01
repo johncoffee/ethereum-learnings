@@ -1,6 +1,11 @@
 var express = require('express');
 var app = express();
 var Api = require("./registry_api")
+var bodyParser = require('body-parser')
+var Record = require('./record')
+
+// create application/json parser
+var jsonParser = bodyParser.json()
 
 api = new Api();
 
@@ -43,31 +48,25 @@ app.get('/record/:key', function (req, res) {
     }
 });
 
+app.post('/record/:key', jsonParser, function (req, res) {
+    if (!req.body) return res.status(500).json({error: "didn't parse JSON body"});
+    if (!req.body.key) return res.sendStatus(400);
+
+    var record = new Record();
+    record.hydrate(req.body);
+    api.update(record, function (err) {
+        console.log(err)
+        if (!err) {
+            res.sendStatus(200);
+        }
+        else {
+            res.sendStatus(500);
+        }
+    });
+});
 
 app.listen(3000, function () {
     console.log('Listening on port 3000!');
 });
 
 
-
-function Record () {
-    this.key = 0;
-    this.time = 0;
-    this.unregisterCost = 0;
-    this.owner = null;
-    this.lat = 0;
-    this.lng = 0;
-}
-
-Record.prototype.fromWeb3Array = function (array) {
-    this.owner = array[0]
-    this.time = array[1]
-    this.lat = array[2]
-    this.lng = array[3]
-    this.unregisterCost = array[4]
-    this.key = array[5]
-}
-
-Record.prototype.toString = function () {
-    return JSON.stringify(this)
-}
