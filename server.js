@@ -13,7 +13,13 @@ app.get('/', function (req, res) {
     res.send(`Hello World! <a href="//docs.registry4.apiary.io/">Documentation at apiary...</a>`);
 });
 
-app.get('/records', function (req, res) {
+const routes = {
+    records: "/records",
+    record: "/record",
+    recordWithKey: "/record/:key",
+};
+
+app.get(routes.records, function (req, res) {
 
     var records = api.getRecords();
 
@@ -37,7 +43,7 @@ app.get('/records', function (req, res) {
     }
 });
 
-app.get('/record/:key', function (req, res) {
+app.get(routes.recordWithKey, function (req, res) {
     console.log(req.params.key);
     var record = api.getRecord();
     if (record) {
@@ -49,7 +55,7 @@ app.get('/record/:key', function (req, res) {
 });
 
 
-app.put('/record', jsonParser, function (req, res) {
+app.put(routes.record, jsonParser, function (req, res) {
     if (!req.body) return res.status(500).json({error: "didn't parse JSON body"});
     if (!req.body.key) return res.sendStatus(400);
 
@@ -66,7 +72,7 @@ app.put('/record', jsonParser, function (req, res) {
     });
 });
 
-app.post('/record/:key', jsonParser, function (req, res) {
+app.post(routes.recordWithKey, jsonParser, function (req, res) {
     if (!req.body) return res.status(500).json({error: "didn't parse JSON body"});
     if (!req.body.key) return res.sendStatus(400);
 
