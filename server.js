@@ -72,7 +72,8 @@ app.put(routes.record, jsonParser, function (req, res) {
     });
 });
 
-app.post(routes.recordWithKey, jsonParser, function (req, res) {
+app.put(routes.recordWithKey, jsonParser, function (req, res) {
+
     if (!req.body) return res.status(500).json({error: "didn't parse JSON body"});
     if (!req.body.key) return res.sendStatus(400);
 
