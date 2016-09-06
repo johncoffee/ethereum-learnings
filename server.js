@@ -43,6 +43,7 @@ app.get(routes.records, function (req, res) {
     }
 });
 
+// list
 app.get(routes.recordWithKey, function (req, res) {
     console.log(req.params.key);
     var record = api.getRecord();
@@ -54,7 +55,7 @@ app.get(routes.recordWithKey, function (req, res) {
     }
 });
 
-
+// create
 app.put(routes.record, jsonParser, function (req, res) {
     if (!req.body) return res.status(500).json({error: "didn't parse JSON body"});
     if (!req.body.key) return res.sendStatus(400);
@@ -72,6 +73,7 @@ app.put(routes.record, jsonParser, function (req, res) {
     });
 });
 
+// update (PUT because Unity3D)
 app.put(routes.recordWithKey, jsonParser, function (req, res) {
 
     if (!req.body) return res.status(500).json({error: "didn't parse JSON body"});
