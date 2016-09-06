@@ -63,8 +63,8 @@ app.put(routes.record, jsonParser, function (req, res) {
     var record = new Record();
     record.hydrate(req.body);
     // fix
-    record.lat = Record.uint16FromLat(req.body.lat)
-    record.lng = Record.uint16FromLng(req.body.lng)
+    record.lat = Record.uintFromLat(req.body.lat)
+    record.lng = Record.uintFromLng(req.body.lng)
 
     api.register(record, function (err) {
         console.log(err)
@@ -86,8 +86,8 @@ app.put(routes.recordWithKey, jsonParser, function (req, res) {
     var record = new Record();
     record.hydrate(req.body);
     // fix
-    record.lat = Record.uint16FromLat(req.body.lat)
-    record.lng = Record.uint16FromLng(req.body.lng)
+    record.lat = Record.uintFromLat(req.body.lat)
+    record.lng = Record.uintFromLng(req.body.lng)
 
     api.update(record, function (err) {
         console.log(err)

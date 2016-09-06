@@ -34,36 +34,36 @@ Record.prototype.toString = function () {
 
 
 Record.prototype.setLatFromUint16 = function (value) {
-    this.lat = Record.angleFromUint16(value, 90).toString()
+    this.lat = Record.angleFromUint(value, 90).toString()
 }
 Record.prototype.setLngFromUint16 = function (value) {
-    this.lng = Record.angleFromUint16(value, 180).toString()
+    this.lng = Record.angleFromUint(value, 180).toString()
 }
 
 // static
 
-Record.uint16Value = Math.pow(2, 16);
+Record.uintSize = Math.pow(2, 16);
 
-Record.angleFromUint16 = function(uint16String, maxAngle) {
+Record.angleFromUint = function(uint16String, maxAngle) {
     var value = (typeof uint16String === "string") ? parseFloat(uint16String) : uint16String;
-    value = Math.min(value, Record.uint16Value)
+    value = Math.min(value, Record.uintSize)
     value = Math.max(value, 0)
-    return -maxAngle + ( value / Record.uint16Value) * maxAngle*2
+    return -maxAngle + ( value / Record.uintSize) * maxAngle*2
 }
 
-Record.uint16FromLat = function (value) {
+Record.uintFromLat = function (value) {
     value = (typeof value === "string") ? parseFloat(value) : value;
-    return Record.uint16FromAngle(value, 90)
+    return Record.uintFromAngle(value, 90)
 }
 
-Record.uint16FromLng = function (value) {
+Record.uintFromLng = function (value) {
     value = (typeof value === "string") ? parseFloat(value) : value;
-    return Record.uint16FromAngle(value, 180)
+    return Record.uintFromAngle(value, 180)
 }
 
-Record.uint16FromAngle = function (value, maxAngle) {
+Record.uintFromAngle = function (value, maxAngle) {
     value = (value+maxAngle) / (maxAngle*2)
-    return value * Record.uint16Value
+    return value * Record.uintSize
 }
 
 
