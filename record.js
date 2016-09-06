@@ -1,11 +1,12 @@
+"use strict";
 
 function Record () {
-    this.key = 0;
-    this.time = 0;
-    this.unregisterCost = 0;
-    this.owner = null;
-    this.lat = 0;
-    this.lng = 0;
+    this.key = "";
+    this.time = "";
+    this.unregisterCost = "";
+    this.owner = "";
+    this.lat = "";
+    this.lng = "";
 }
 
 Record.prototype.hydrate = function (values) {
@@ -18,8 +19,8 @@ Record.prototype.fromWeb3Array = function (array) {
     this.owner = array[0]
     this.time = array[1]
 
-    this.lat = Record.splitInt(array[2], 3)
-    this.lng = Record.splitInt(array[3], 3)
+    this.setLatFromUint16(array[2])
+    this.setLngFromUint16(array[3])
 
     this.unregisterCost = array[4]
     this.key = array[5]
@@ -31,15 +32,39 @@ Record.prototype.toString = function () {
     return JSON.stringify(this)
 }
 
-// input: "1267", 2 output: 67.12
-Record.splitInt = function (int, precision) {
-    if (typeof int !== "string")
-        int = int.toString();
 
-    if (int.length > precision)
-        int = int.substring(int.length-precision, int.length ) + "." + int.substring(0, int.length-precision);
-
-    return int;
+Record.prototype.setLatFromUint16 = function (value) {
+    this.lat = Record.angleFromUint16(value, 90).toString()
 }
+Record.prototype.setLngFromUint16 = function (value) {
+    this.lng = Record.angleFromUint16(value, 180).toString()
+}
+
+// static
+
+Record.uint16Value = Math.pow(2, 16);
+
+Record.angleFromUint16 = function(uint16String, maxAngle) {
+    var value = (typeof uint16String === "string") ? parseFloat(uint16String) : uint16String;
+    value = Math.min(value, Record.uint16Value)
+    value = Math.max(value, 0)
+    return -maxAngle + ( value / Record.uint16Value) * maxAngle*2
+}
+
+Record.uint16FromLat = function (value) {
+    value = (typeof value === "string") ? parseFloat(value) : value;
+    return Record.uint16FromAngle(value, 90)
+}
+
+Record.uint16FromLng = function (value) {
+    value = (typeof value === "string") ? parseFloat(value) : value;
+    return Record.uint16FromAngle(value, 180)
+}
+
+Record.uint16FromAngle = function (value, maxAngle) {
+    value = (value+maxAngle) / (maxAngle*2)
+    return value * Record.uint16Value
+}
+
 
 module.exports = Record
