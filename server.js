@@ -16,8 +16,13 @@ app.get('/', function (req, res) {
 const routes = {
     records: "/records",
     record: "/record",
+    accounts: "/accounts",
     recordWithKey: "/record/:key",
 };
+
+app.get(routes.accounts, function (req, res) {
+    res.json(api.accounts());
+});
 
 app.get(routes.records, function (req, res) {
 

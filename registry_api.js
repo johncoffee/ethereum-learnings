@@ -31,6 +31,14 @@ function Api() {
         console.log("connected: " + web3.isConnected());
     }
 
+    this.accounts = function () {
+        return web3.eth.accounts.map(function (item) {
+            return {
+                address: item
+            }
+        })
+    }
+
     this.getRecords = function () {
         var records = getKeys().map(function(item) {
             var r = contractInstance.getRecord(item)
