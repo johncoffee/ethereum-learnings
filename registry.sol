@@ -32,8 +32,8 @@ contract BaseRegistry is Owned {
         // Keeps the index of the keys array for fast lookup
         uint keysIndex;
 
-        int16 lat;
-        int16 lng;
+        uint16 lat;
+        uint16 lng;
         address[] owners;
     }
 
@@ -56,7 +56,7 @@ contract BaseRegistry is Owned {
     }
 
     // This is the function that actually insert a record.
-    function register(int key, int16 lat, int16 lng) {
+    function register(int key, uint16 lat, uint16 lng) {
         if (records[key].time == 0) {
             records[key].time = now;
             records[key].keysIndex = keys.length;
@@ -131,7 +131,7 @@ contract BaseRegistry is Owned {
         return records[key].time != 0;
     }
 
-    function getRecordAtIndex(uint rindex) public constant returns(address owner, uint time, int16 lat, int16 lng, uint numOwners) {
+    function getRecordAtIndex(uint rindex) public constant returns(address owner, uint time, uint16 lat, uint16 lng, uint numOwners) {
         int key = keys[rindex];
         Record record = records[key];
         owner = getOwner(key);
@@ -141,7 +141,7 @@ contract BaseRegistry is Owned {
         numOwners = record.owners.length;
     }
 
-    function getRecord(int key) public constant returns(address owner, uint time, int16 lat, int16 lng) {
+    function getRecord(int key) public constant returns(address owner, uint time, uint16 lat, uint16 lng) {
         Record record = records[key];
         owner = getOwner(key);
         time = record.time;
