@@ -23,7 +23,7 @@ Record.prototype.fromWeb3Array = function (array) {
     this.setLatFromUint16(array[2])
     this.setLngFromUint16(array[3])
 
-    this.key = array[5]
+    this.key = array[4]
 }
 
 Record.prototype.toString = function () {
