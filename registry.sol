@@ -1,5 +1,10 @@
+pragma solidity ^0.4.0;
+
 contract Owned {
-  function owned() { owner = msg.sender; }
+
+  function Owned() {
+      owner = msg.sender;
+  }
 
     // The owner of this registry.
     address public owner = msg.sender;
@@ -10,7 +15,7 @@ contract Owned {
     // definition of a modifier appears.
     modifier onlyOwner {
         if (msg.sender != owner) throw;
-        _
+        _;
     }
 
     function kill() onlyOwner {
@@ -26,11 +31,14 @@ contract BaseRegistry is Owned {
         uint time;
         // Keeps the index of the keys array for fast lookup
         uint keysIndex;
-        int lat;
-        int lng;
-        address owner;
-        uint unregisterCost;
+
+        int16 lat;
+        int16 lng;
+        address[] owners;
     }
+
+    // for paying participants
+    mapping(address => int) wallets;
 
     // This mapping keeps the records of this Registry.
     mapping(int => Record) records;
@@ -41,19 +49,18 @@ contract BaseRegistry is Owned {
     // Keeps a list of all keys to interate the records.
     int[] public keys;
 
-
     modifier onlyRecordOwner(int key, address sender) {
         address owner = getOwner(key);
         if (owner != sender) throw;
-        _
+        _;
     }
 
     // This is the function that actually insert a record.
-    function register(int key, int lat, int lng) {
+    function register(int key, int16 lat, int16 lng) {
         if (records[key].time == 0) {
             records[key].time = now;
             records[key].keysIndex = keys.length;
-            records[key].owner = msg.sender;
+            records[key].owners.push(msg.sender);
             records[key].lat = lat;
             records[key].lng = lng;
 
@@ -67,14 +74,45 @@ contract BaseRegistry is Owned {
         }
     }
 
+    function getUnregisterCost(int key) returns (uint cost) {
+        Record record = records[key];
+        return record.owners.length * 1000;
+    }
+
     // Unregister a given record
     function unregister(int key) onlyRecordOwner(key, msg.sender) {
-            uint keysIndex = records[key].keysIndex;
-            delete records[key];
-            numRecords--;
-            keys[keysIndex] = keys[keys.length - 1];
-            records[keys[keysIndex]].keysIndex = keysIndex;
-            keys.length--;
+        Record record = records[key];
+
+        if (record.owners.length > 1) {
+            uint unregisterCost = getUnregisterCost(key);
+            if (msg.value == unregisterCost) {
+                distributeToOwners(key, msg.value);
+            }
+        }
+
+        uint keysIndex = record.keysIndex;
+        delete records[key];
+        numRecords--;
+        keys[keysIndex] = keys[keys.length - 1];
+        records[keys[keysIndex]].keysIndex = keysIndex;
+        keys.length--;
+    }
+
+    // for testing
+    function sendToOwners(int key) {
+        Record record = records[key];
+        distributeToOwners(key, msg.value);
+    }
+
+    function distributeToOwners(int key, uint amount) {
+        Record record = records[key];
+        uint amountEach = amount / record.owners.length;
+        for (uint i = 0; i < record.owners.length; i++) {
+            address owner = record.owners[i];
+            if (owner.send(amountEach)) {
+                // nothing to do
+            }
+        }
     }
 
 
@@ -82,7 +120,7 @@ contract BaseRegistry is Owned {
     function transfer(int key, address newOwner) {
         address owner = getOwner(key);
         if (owner == msg.sender) {
-            records[key].owner = newOwner;
+            records[key].owners.push(newOwner);
         } else {
             throw;
         }
@@ -93,29 +131,28 @@ contract BaseRegistry is Owned {
         return records[key].time != 0;
     }
 
-    function getRecordAtIndex(uint rindex) public constant returns(address owner, uint time, int lat, int lng, uint unregisterCost) {
+    function getRecordAtIndex(uint rindex) public constant returns(address owner, uint time, int16 lat, int16 lng, uint numOwners) {
         int key = keys[rindex];
         Record record = records[key];
         owner = getOwner(key);
         time = record.time;
         lat = record.lat;
         lng = record.lng;
-        unregisterCost = record.unregisterCost;
+        numOwners = record.owners.length;
     }
 
-    function getRecord(int key) public constant returns(address owner, uint time, int lat, int lng, uint unregisterCost) {
+    function getRecord(int key) public constant returns(address owner, uint time, int16 lat, int16 lng) {
         Record record = records[key];
         owner = getOwner(key);
         time = record.time;
         lat = record.lat;
         lng = record.lng;
-        unregisterCost = record.unregisterCost;
     }
 
     // Returns the owner (address) of the given record.
     function getOwner(int key)  public constant returns(address) {
         Record record = records[key];
-        return record.owner;
+        return record.owners[record.owners.length-1];
     }
 
     // Returns the registration time of the given record. The time could also
