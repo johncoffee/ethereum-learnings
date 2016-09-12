@@ -104,15 +104,20 @@ contract BaseRegistry is Owned {
         distributeToOwners(key, msg.value);
     }
 
-    function distributeToOwners(int key, uint amount) {
+     function distributeToOwners(int key, uint amount) {
         Record record = records[key];
-        uint amountEach = amount / record.owners.length;
+        uint rest = amount % record.owners.length; // rest is accumulated on the registry address
+        uint amountEach = (amount-rest) / record.owners.length;
+        address owner;
+
         for (uint i = 0; i < record.owners.length; i++) {
-            address owner = record.owners[i];
+            owner = record.owners[i];
             if (owner.send(amountEach)) {
                 // nothing to do
             }
         }
+
+        record.owners[0].send(rest); // rest to the initial creator
     }
 
 
