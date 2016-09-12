@@ -1,3 +1,4 @@
+var moment = require('moment');
 var express = require('express');
 var app = express();
 var Api = require("./registry_api")
@@ -31,6 +32,7 @@ app.get(routes.records, function (req, res) {
     records = records.map(function(item) {
         var recordEntity = new Record();
         recordEntity.fromWeb3Array(item);
+        recordEntity.time = moment( new Date( recordEntity.time * 1000) ).format(Record.TIME_FORMAT)
         return recordEntity;
     });
 

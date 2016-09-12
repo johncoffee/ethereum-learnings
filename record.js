@@ -3,10 +3,11 @@
 function Record () {
     this.key = "";
     this.time = "";
-    this.unregisterCost = "";
     this.owner = "";
     this.lat = "";
     this.lng = "";
+
+    Object.seal(this)
 }
 
 Record.prototype.hydrate = function (values) {
@@ -22,10 +23,7 @@ Record.prototype.fromWeb3Array = function (array) {
     this.setLatFromUint16(array[2])
     this.setLngFromUint16(array[3])
 
-    this.unregisterCost = array[4]
     this.key = array[5]
-
-    this._debug_fromWeb3Array = array
 }
 
 Record.prototype.toString = function () {
@@ -65,6 +63,8 @@ Record.uintFromAngle = function (value, maxAngle) {
     value = (value+maxAngle) / (maxAngle*2)
     return value * Record.uintSize
 }
+
+Record.TIME_FORMAT = "YYYY-MM-DD HH:mm Z"
 
 
 module.exports = Record
