@@ -1,4 +1,4 @@
-pragma solidity ^0.4.0;
+// pragma solidity 0.2.0;
 
 contract Owned {
 
@@ -15,7 +15,7 @@ contract Owned {
     // definition of a modifier appears.
     modifier onlyOwner {
         if (msg.sender != owner) throw;
-        _;
+        _
     }
 
     function kill() onlyOwner {
@@ -52,7 +52,7 @@ contract BaseRegistry is Owned {
     modifier onlyRecordOwner(int key, address sender) {
         address owner = getOwner(key);
         if (owner != sender) throw;
-        _;
+        _
     }
 
     // This is the function that actually insert a record.
