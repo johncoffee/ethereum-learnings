@@ -76,9 +76,12 @@ function Api() {
         contractInstance.register(record.key, record.lat, record.lng, {gas: 1000000}, callback);
     }
 
-    this.transfer = function( key, newOwner) {
-        console.log("transfer", key, newOwner);
-        contractInstance.transfer( key, newOwner);
+    this.transfer = function( key, from, to, callback) {
+        console.log("transfer", key, to);
+        contractInstance.transfer( key, to, {
+            from: from,
+            gas: 190000,
+        }, callback);
     }
 
     constructor();

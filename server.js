@@ -19,6 +19,7 @@ const routes = {
     record: "/record",
     accounts: "/accounts",
     recordWithKey: "/record/:key",
+    transfer: "/transfer"
 };
 
 app.get(routes.accounts, function (req, res) {
@@ -60,6 +61,31 @@ app.get(routes.recordWithKey, function (req, res) {
     else {
         res.status(500).json({error: "problems..."});
     }
+});
+
+// transfer
+app.put(routes.transfer, jsonParser, function (req, res) {
+    if (!req.body) return res.status(500).json({error: "didn't parse JSON body"});
+    if (!req.body.key) return res.sendStatus(400);
+
+    var key = req.body.key;
+    var to = req.body.to;
+    var from = (req.body.from.length == 42) ? req.body.from : undefined;
+    console.log(from.length)
+
+    if (!to) return res.status(400).json({error: "no to"});
+    //if (!from) return res.status(400).json({error: "no from"});
+
+    api.transfer(key, from, to, function (err) {
+        console.log(err)
+        if (!err) {
+            console.log("transfer");
+            res.sendStatus(200);
+        }
+        else {
+            res.sendStatus(500);
+        }
+    });
 });
 
 // create
