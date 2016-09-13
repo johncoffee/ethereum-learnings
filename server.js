@@ -54,7 +54,7 @@ app.get(routes.records, function (req, res) {
 app.get(routes.recordWithKey, function (req, res) {
     var key = req.params.key
     var array = api.getRecord(key);
-    console.log(array)
+    //console.log(array)
     var r = new Record()
     r.fromWeb3Array(array)
     r.key = key;
@@ -95,26 +95,40 @@ app.put(routes.transfer, jsonParser, function (req, res) {
     });
 });
 
-// create
+// create/update
 app.put(routes.record, jsonParser, function (req, res) {
     if (!req.body) return res.status(500).json({error: "didn't parse JSON body"});
-    if (!req.body.key) return res.sendStatus(400);
 
-    var record = new Record();
+    var key = req.body.key
+    var array = api.getRecord(key);
+    var record = new Record()
+
+    record.fromWeb3Array(array)
+    var isNew = (record.time == 0)
+
     record.hydrate(req.body);
-    // fix
-    record.lat = Record.uintFromLat(req.body.lat)
-    record.lng = Record.uintFromLng(req.body.lng)
+    record.lat = Record.uintFromLat(record.lat).toString()
+    record.lng = Record.uintFromLng(record.lng).toString()
 
-    api.register(record, function (err) {
+    if (isNew) {
+        console.log('is new')
+        record.key = key;
+        api.register(record, callback);
+    }
+    else {
+        console.log('is updated')
+        api.updateLocation(record, callback);
+    }
+
+    function callback(err) {
         if (!err) {
-            console.log("created");
+            console.log("done");
             res.sendStatus(200);
         }
         else {
             res.sendStatus(500);
         }
-    });
+    }
 });
 
 app.listen(3000, function () {

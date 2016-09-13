@@ -61,7 +61,7 @@ Record.uintFromLng = function (value) {
 
 Record.uintFromAngle = function (value, maxAngle) {
     value = (value+maxAngle) / (maxAngle*2)
-    return value * Record.uintSize
+    return Math.round(value * Record.uintSize)
 }
 
 Record.TIME_FORMAT = "YYYY-MM-DD HH:mm Z"
