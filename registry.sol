@@ -74,6 +74,11 @@ contract BaseRegistry is Owned {
         }
     }
 
+    function updateLocation(int key, uint16 lat, uint16 lng) onlyRecordOwner(key, msg.sender) {
+        records[key].lat = lat;
+        records[key].lng = lng;
+    }
+
     function getUnregisterCost(int key) returns (uint cost) {
         Record record = records[key];
         return record.owners.length * 1000;
