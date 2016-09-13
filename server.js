@@ -51,12 +51,19 @@ app.get(routes.records, function (req, res) {
     }
 });
 
-// list
 app.get(routes.recordWithKey, function (req, res) {
+    var key = req.params.key
+    var array = api.getRecord(key);
+    console.log(array)
+    var r = new Record()
+    r.fromWeb3Array(array)
+    r.key = key;
 
-    var record = api.getRecord();
-    if (record) {
-        res.json(record);
+    if (r.time == 0) {
+        res.sendStatus(404);
+    }
+    else if (r.time != 0) {
+        res.json(r)
     }
     else {
         res.status(500).json({error: "problems..."});
