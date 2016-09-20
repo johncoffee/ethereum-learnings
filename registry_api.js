@@ -32,9 +32,12 @@ function Api() {
     }
 
     this.accounts = function () {
-        return web3.eth.accounts.map(function (item) {
+        return web3.eth.accounts.map(function (address) {
+            var balance = web3.eth.getBalance(address);
             return {
-                address: item
+                address: address,
+                balance: balance,
+                balanceFinney: web3.fromWei(balance, 'finney'),
             }
         })
     }
