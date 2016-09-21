@@ -38,6 +38,9 @@ function Api() {
                 address: address,
                 balance: balance,
                 balanceFinney: web3.fromWei(balance, 'finney'),
+                toString: function() {
+                    return JSON.stringify(this);
+                }
             }
         })
     }

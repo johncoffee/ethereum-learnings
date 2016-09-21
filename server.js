@@ -23,7 +23,14 @@ const routes = {
 };
 
 app.get(routes.accounts, function (req, res) {
-    res.json(api.accounts());
+    var accounts = api.accounts();
+    if (req.query.format == "sjon") {
+        res.set('Content-Type', 'text/plain');
+        res.send(accounts.join("\n"));
+    }
+    else {
+        res.json(accounts); // not json because ... reasons
+    }
 });
 
 app.get(routes.records, function (req, res) {
