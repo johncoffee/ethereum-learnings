@@ -10,7 +10,7 @@ web3.eth.defaultAccount = web3.eth.coinbase;
 
 function Api() {
 
-    contractInstance = null
+    let contractInstance = null
 
     function constructor() {
 
