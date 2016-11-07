@@ -64,7 +64,5 @@ Record.uintFromAngle = function (value, maxAngle) {
     return Math.round(value * Record.uintSize)
 }
 
-Record.TIME_FORMAT = "YYYY-MM-DD HH:mm Z"
-
 
 module.exports = Record
