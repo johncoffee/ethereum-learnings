@@ -18,7 +18,7 @@ const routes = {
     records: "/records",
     record: "/record",
     accounts: "/accounts",
-    recordWithKey: "/record/:key",
+    recordKey: "/record/:key",
     transfer: "/transfer"
 };
 
@@ -54,7 +54,7 @@ app.get(routes.records, function (req, res) {
     }
 });
 
-app.get(routes.recordWithKey, function (req, res) {
+app.get(routes.recordKey, function (req, res) {
     var key = req.params.key
     var array = api.getRecord(key);
     //console.log(array)
