@@ -1,7 +1,7 @@
-let record = require('./record')
+let record = require('../record')
 
-let lat = process.argv[2]
-let lng = process.argv[3]
+let lat = process.argv[2] // horizontal
+let lng = process.argv[3] // vertical
 
 if (!lat || !lng) {
     console.log(`usage: [lat] [lng]`)
