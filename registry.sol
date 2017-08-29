@@ -26,9 +26,6 @@ contract Owned {
 contract Registry is Owned {
     // This struct keeps all data for a Record.
     struct Record {
-    // Keeps the address of this record creator.
-    // Keeps the time when this record was created.
-    uint time;
     // Keeps the index of the keys array for fast lookup
     uint keysIndex;
 
@@ -57,9 +54,6 @@ contract Registry is Owned {
 
     // This is the function that actually insert a record.
     function register(int key, uint16 lat, uint16 lng) {
-        require (records[key].time == 0);
-
-        records[key].time = now;
         records[key].keysIndex = keys.length;
         records[key].owners.push(msg.sender);
         records[key].lat = lat;
@@ -128,25 +122,18 @@ contract Registry is Owned {
         records[key].owners.push(newOwner);
     }
 
-    // Tells whether a given key is registered.
-    function isRegistered(int key) public constant returns(bool) {
-        return records[key].time != 0;
-    }
-
-    function getRecordAtIndex(uint rindex) public constant returns(address owner, uint time, uint16 lat, uint16 lng, uint numOwners) {
+    function getRecordAtIndex(uint rindex) public constant returns(address owner, uint16 lat, uint16 lng, uint numOwners) {
         int key = keys[rindex];
         Record storage record = records[key];
         owner = getOwner(key);
-        time = record.time;
         lat = record.lat;
         lng = record.lng;
         numOwners = record.owners.length;
     }
 
-    function getRecord(int key) public constant returns(address owner, uint time, uint16 lat, uint16 lng) {
+    function getRecord(int key) public constant returns(address owner,  uint16 lat, uint16 lng) {
         Record storage record = records[key];
         owner = getOwner(key);
-        time = record.time;
         lat = record.lat;
         lng = record.lng;
     }
@@ -155,13 +142,6 @@ contract Registry is Owned {
     function getOwner(int key)  public constant returns(address) {
         Record storage record = records[key];
         return record.owners[record.owners.length-1];
-    }
-
-    // Returns the registration time of the given record. The time could also
-    // be get by using the function getRecord but in that case all record attributes
-    // are returned.
-    function getTime(int key)  public constant returns(uint) {
-        return records[key].time;
     }
 
     function empty() onlyOwner {
